@@ -1,6 +1,6 @@
 
 # Your objective is to build a Bubble Plot that showcases the relationship between four key variables:
-Average Fare ($) Per City -         group_ride_avg
+Average Fare ($) Per City -         g_ride_avg
 #Total Number of Rides Per City -    ride_sum
 #Total Number of Drivers Per City-   num_driv
 #City Type (Urban, Suburban, Rural)
@@ -9,12 +9,14 @@ Average Fare ($) Per City -         group_ride_avg
 #% of Total Rides by City Type
 #% of Total Drivers by City Type
 
-#Three observable trends
-1- The most obvious trend relates to the city size.  
-    a: The larger the city, the more drivers there are.
-    b: The larger the city, the lower the average fare (obviously based upon distance traveled).
-    c: The smaller the city, the longer the distance, the greater the fare and fewer drivers.
-2-Surprising trend is that the combination of rural and suburban fairs combined, tend to be more than fares in urban areas. 
+
+```python
+#Observable trends
+#The most obvious trends relate to the city size.  
+#    1: The larger the city, the more drivers there are.
+#    2: The larger the city, the lower the average fare (obviously based upon distance traveled).
+#    3: The smaller the city, the longer the distance, the greater the fare and fewer drivers. 
+```
 
 
 ```python
@@ -30,77 +32,13 @@ path1="Generators/Pyber/generated_data/ride_data.csv"
 path2="Generators/Pyber/generated_data/city_data.csv"
 ride=pd.read_csv(path1,encoding="utf-8")
 city=pd.read_csv(path2,encoding="utf-8")
-ride.head()
+#ride.head()
 ```
 
 
-
-
-<div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>city</th>
-      <th>date</th>
-      <th>fare</th>
-      <th>ride_id</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Karenfurt</td>
-      <td>2017-01-01 19:03:03</td>
-      <td>32.90</td>
-      <td>3383346995405</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Melissaborough</td>
-      <td>2017-01-01 08:55:58</td>
-      <td>19.59</td>
-      <td>2791839504576</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Port Sandraport</td>
-      <td>2017-01-01 16:21:54</td>
-      <td>31.04</td>
-      <td>3341437383289</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Curtismouth</td>
-      <td>2017-01-03 06:36:53</td>
-      <td>15.12</td>
-      <td>6557246300691</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Port Michael</td>
-      <td>2017-01-03 09:56:52</td>
-      <td>19.65</td>
-      <td>9887635746234</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
+```python
+#city.head()
+```
 
 
 ```python
@@ -109,71 +47,9 @@ ride.head()
 
 
 ```python
-city.head()
+tot_fare=ride["fare"].sum()
+#tot_fare
 ```
-
-
-
-
-<div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>city</th>
-      <th>driver_count</th>
-      <th>type</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Tammyburgh</td>
-      <td>11</td>
-      <td>Urban</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Melissaborough</td>
-      <td>15</td>
-      <td>Urban</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Port Brianborough</td>
-      <td>62</td>
-      <td>Urban</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>New Katherine</td>
-      <td>68</td>
-      <td>Urban</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Lake Charlesside</td>
-      <td>65</td>
-      <td>Urban</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
 
 
 ```python
@@ -182,13 +58,92 @@ city.head()
 
 
 ```python
-#city.count()
+merge_ride_city=pd.merge(ride,city,on="city",how="left")
+#len(merge_ride_city)
+#merge_ride_city.head()
 ```
 
 
 ```python
-cty_typ=city[["city","type"]]
-cty_typ.head()
+mrc=merge_ride_city[["city","fare","ride_id","driver_count","type"]]
+#mrc.head()
+```
+
+
+```python
+#len(mrc)
+```
+
+
+```python
+#Count of rides by city and type :
+```
+
+
+```python
+mctr=mrc[["city","type","ride_id"]]
+mctr2=mctr.groupby(["city","type"]).count()
+mctr3=mctr2.reset_index()
+#mctr3.head()
+```
+
+
+```python
+#len(mctr3)
+```
+
+
+```python
+#Add driver count to city, type and rides :
+```
+
+
+```python
+mctrd=pd.merge(mctr3,city,on="city",how="outer")
+mctrd2=mctrd[["city","type_x","ride_id","driver_count"]]
+mctrd3=mctrd2.rename(columns={"type_x":"type","ride_id":"rides"})
+#mctrd3.head()
+```
+
+
+```python
+#len(mctrd3)
+```
+
+
+```python
+mctf=merge_ride_city[["city","type","fare"]]
+mctf2=mctf.groupby(["city","type"]).sum()
+mctf3=mctf2.reset_index()
+#mctf3.head()
+```
+
+
+```python
+#len(mctf3)
+```
+
+
+```python
+#Add sum of fares to city, type, rides and driver_count :
+```
+
+
+```python
+mctrdf=pd.merge(mctrd3,mctf3,on="city",how="outer")
+#mctrdf.head()
+```
+
+
+```python
+mctrdf2=mctrdf[["city","type_x","rides","driver_count","fare"]]
+#mctrdf2.head()
+```
+
+
+```python
+mctrdf3=mctrdf2.rename(columns={"type_x":"type"})
+mctrdf3.head()
 ```
 
 
@@ -214,33 +169,51 @@ cty_typ.head()
       <th></th>
       <th>city</th>
       <th>type</th>
+      <th>rides</th>
+      <th>driver_count</th>
+      <th>fare</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>Tammyburgh</td>
-      <td>Urban</td>
+      <td>Adamschester</td>
+      <td>Suburban</td>
+      <td>9</td>
+      <td>27</td>
+      <td>266.35</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>Melissaborough</td>
+      <td>Alexisfort</td>
       <td>Urban</td>
+      <td>33</td>
+      <td>24</td>
+      <td>903.11</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>Port Brianborough</td>
-      <td>Urban</td>
+      <td>Amberberg</td>
+      <td>Suburban</td>
+      <td>16</td>
+      <td>13</td>
+      <td>457.99</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>New Katherine</td>
-      <td>Urban</td>
+      <td>Anthonyfurt</td>
+      <td>Suburban</td>
+      <td>17</td>
+      <td>17</td>
+      <td>501.35</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>Lake Charlesside</td>
-      <td>Urban</td>
+      <td>Boyleberg</td>
+      <td>Suburban</td>
+      <td>5</td>
+      <td>13</td>
+      <td>161.98</td>
     </tr>
   </tbody>
 </table>
@@ -250,42 +223,7 @@ cty_typ.head()
 
 
 ```python
-nmb_driv=city[["city","driver_count"]]
-#nmb_driv.head()
-```
-
-
-```python
-n_driv=nmb_driv.set_index("city")
-num_driv=n_driv.reset_index()
-#num_driv.head()
-```
-
-
-```python
 #ride.count()
-```
-
-
-```python
-ride_summary=(ride["city"].value_counts())
-ride_sum=pd.DataFrame(ride_summary)
-rs2=ride_sum.reset_index()
-rs=rs2.rename(columns={"index":"city","city":"rides"})
-```
-
-
-```python
-#fare.count
-```
-
-
-```python
-fare_city=ride[["city","fare"]]
-fc=fare_city.groupby(["city"]).mean()
-fc2=pd.DataFrame(fc)
-farecity=fc2.reset_index()
-#farecity.head()
 ```
 
 
@@ -295,483 +233,42 @@ farecity=fc2.reset_index()
 
 
 ```python
-mrc=pd.merge(num_driv,rs,on="city",how="outer")
-mrc.head()
-```
-
-
-
-
-<div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>city</th>
-      <th>driver_count</th>
-      <th>rides</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Tammyburgh</td>
-      <td>11</td>
-      <td>22</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Melissaborough</td>
-      <td>15</td>
-      <td>17</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Port Brianborough</td>
-      <td>62</td>
-      <td>26</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>New Katherine</td>
-      <td>68</td>
-      <td>19</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Lake Charlesside</td>
-      <td>65</td>
-      <td>25</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-mcdrf=pd.merge(mrc,farecity,on="city",how="outer")
-mcdrf.head()
-```
-
-
-
-
-<div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>city</th>
-      <th>driver_count</th>
-      <th>rides</th>
-      <th>fare</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Tammyburgh</td>
-      <td>11</td>
-      <td>22</td>
-      <td>20.718636</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Melissaborough</td>
-      <td>15</td>
-      <td>17</td>
-      <td>23.906471</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Port Brianborough</td>
-      <td>62</td>
-      <td>26</td>
-      <td>25.070769</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>New Katherine</td>
-      <td>68</td>
-      <td>19</td>
-      <td>27.814211</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Lake Charlesside</td>
-      <td>65</td>
-      <td>25</td>
-      <td>22.714800</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-mcdrft=pd.merge(mcdrf,cty_typ,on="city",how="outer")
-mcdrft.head()
-```
-
-
-
-
-<div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>city</th>
-      <th>driver_count</th>
-      <th>rides</th>
-      <th>fare</th>
-      <th>type</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Tammyburgh</td>
-      <td>11</td>
-      <td>22</td>
-      <td>20.718636</td>
-      <td>Urban</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Melissaborough</td>
-      <td>15</td>
-      <td>17</td>
-      <td>23.906471</td>
-      <td>Urban</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Port Brianborough</td>
-      <td>62</td>
-      <td>26</td>
-      <td>25.070769</td>
-      <td>Urban</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>New Katherine</td>
-      <td>68</td>
-      <td>19</td>
-      <td>27.814211</td>
-      <td>Urban</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Lake Charlesside</td>
-      <td>65</td>
-      <td>25</td>
-      <td>22.714800</td>
-      <td>Urban</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-rural_data=mcdrft.loc[mcdrft["type"]=="Rural",:]
+rural_data=mctrdf3.loc[mctrdf3["type"]=="Rural",:]
 r_data=pd.DataFrame(rural_data)
-r_data.head()
+#r_data.head()
 ```
 
 
-
-
-<div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>city</th>
-      <th>driver_count</th>
-      <th>rides</th>
-      <th>fare</th>
-      <th>type</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>108</th>
-      <td>Port Jameston</td>
-      <td>2</td>
-      <td>11</td>
-      <td>39.795455</td>
-      <td>Rural</td>
-    </tr>
-    <tr>
-      <th>109</th>
-      <td>Campbellmouth</td>
-      <td>2</td>
-      <td>8</td>
-      <td>34.177500</td>
-      <td>Rural</td>
-    </tr>
-    <tr>
-      <th>110</th>
-      <td>Joshuaview</td>
-      <td>1</td>
-      <td>11</td>
-      <td>37.829091</td>
-      <td>Rural</td>
-    </tr>
-    <tr>
-      <th>111</th>
-      <td>South Samanthafurt</td>
-      <td>8</td>
-      <td>7</td>
-      <td>28.767143</td>
-      <td>Rural</td>
-    </tr>
-    <tr>
-      <th>112</th>
-      <td>Nguyenshire</td>
-      <td>3</td>
-      <td>5</td>
-      <td>30.830000</td>
-      <td>Rural</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
+```python
+r_data["Avg_fare"]=r_data["fare"]/r_data["rides"]
+#r_data.head()
+```
 
 
 ```python
-sub_data=mcdrft.loc[mcdrft["type"]=="Suburban",:]
+sub_data=mctrdf3.loc[mctrdf3["type"]=="Suburban",:]
 s_data=pd.DataFrame(sub_data)
-s_data.head()
+s_data["Avg_fare"]=s_data["fare"]/s_data["rides"]
+#s_data.head()
+
 ```
-
-
-
-
-<div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>city</th>
-      <th>driver_count</th>
-      <th>rides</th>
-      <th>fare</th>
-      <th>type</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>66</th>
-      <td>Hallmouth</td>
-      <td>10</td>
-      <td>19</td>
-      <td>32.337895</td>
-      <td>Suburban</td>
-    </tr>
-    <tr>
-      <th>67</th>
-      <td>Marieview</td>
-      <td>17</td>
-      <td>12</td>
-      <td>29.390833</td>
-      <td>Suburban</td>
-    </tr>
-    <tr>
-      <th>68</th>
-      <td>Davidbury</td>
-      <td>13</td>
-      <td>20</td>
-      <td>30.834000</td>
-      <td>Suburban</td>
-    </tr>
-    <tr>
-      <th>69</th>
-      <td>Robertsonhaven</td>
-      <td>1</td>
-      <td>21</td>
-      <td>36.210000</td>
-      <td>Suburban</td>
-    </tr>
-    <tr>
-      <th>70</th>
-      <td>West Darrellmouth</td>
-      <td>10</td>
-      <td>18</td>
-      <td>22.373333</td>
-      <td>Suburban</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
 
 
 ```python
-urban_data=mcdrft.loc[mcdrft["type"]=="Urban",:]
+urban_data=mctrdf3.loc[mctrdf3["type"]=="Urban",:]
 u_data=pd.DataFrame(urban_data)
-u_data.head()
+u_data["Avg_fare"]=u_data["fare"]/u_data["rides"]
+#u_data.head()
 ```
-
-
-
-
-<div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>city</th>
-      <th>driver_count</th>
-      <th>rides</th>
-      <th>fare</th>
-      <th>type</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Tammyburgh</td>
-      <td>11</td>
-      <td>22</td>
-      <td>20.718636</td>
-      <td>Urban</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Melissaborough</td>
-      <td>15</td>
-      <td>17</td>
-      <td>23.906471</td>
-      <td>Urban</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Port Brianborough</td>
-      <td>62</td>
-      <td>26</td>
-      <td>25.070769</td>
-      <td>Urban</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>New Katherine</td>
-      <td>68</td>
-      <td>19</td>
-      <td>27.814211</td>
-      <td>Urban</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Lake Charlesside</td>
-      <td>65</td>
-      <td>25</td>
-      <td>22.714800</td>
-      <td>Urban</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
 
 
 ```python
 x_axis_s=s_data["rides"]
 x_axis_u=u_data["rides"]
 x_axis_r=r_data["rides"]
-y_axis_s=s_data["fare"]
-y_axis_u=u_data["fare"]
-y_axis_r=r_data["fare"]
+y_axis_s=s_data["Avg_fare"]
+y_axis_u=u_data["Avg_fare"]
+y_axis_r=r_data["Avg_fare"]
 size_s=s_data["driver_count"]
 size_u=u_data["driver_count"]
 size_r=r_data["driver_count"]
@@ -789,51 +286,12 @@ plt.title("Pyber Ride Sharing Data (2016)")
 plt.xlabel("Total # of Rides by City")
 plt.ylabel("Average Fares ($)")
 plt.legend(loc="upper right")
+plt.savefig("Scatter Ride Sharing.png")
 plt.show()
 ```
 
 
-![png](output_23_0.png)
-
-
-
-```python
-
-```
-
-
-```python
-test=ride.loc[(ride["city"]=="Adamschester"),:]
-#test.head(10)
-```
-
-
-```python
-avg_ride=ride[["city","fare"]]
-```
-
-
-```python
-group_avg_ride=avg_ride.groupby(["city"])
-```
-
-
-```python
-group_ride_avg=group_avg_ride.mean()
-g_ride=group_ride_avg.reset_index()
-#g_ride.head()
-```
-
-
-```python
-len(g_ride)
-```
-
-
-
-
-    126
-
+![png](output_30_0.png)
 
 
 
@@ -843,13 +301,7 @@ len(g_ride)
 
 
 ```python
-city_ride=pd.merge(city,rs,on="city",how="outer")
-#city_ride.head()
-```
-
-
-```python
-rides_by_city_type=city_ride[["type","rides"]]
+rides_by_city_type=mctrdf3[["type","rides"]]
 #rides_by_city_type.head()
 ```
 
@@ -886,28 +338,25 @@ plt.show()
 
 
 ```python
-city_fare=pd.merge(city,g_ride,on="city",how="outer")
-city_fares=city_fare[["type","fare"]]
-#city_fares.head()
+fares_by_city_type=mctrdf3[["type","fare"]]
 ```
 
 
 ```python
-fbct=city_fares.groupby(["type"])
+fbct=fares_by_city_type.groupby(["type"])
 c_fare=fbct.sum()
 cy_fare=c_fare.reset_index()
-#cy_fare.head()
 ```
 
 
 ```python
-label2=cy_fare["type"]
-slices2=cy_fare["fare"]
-colors2=["gold","deepskyblue","lightcoral"]
-explode2=(0.0,0,0.05)
-plt.pie(slices2,explode=explode2,labels=label2,colors=colors2,shadow=True,autopct="%1.1f%%",startangle=140)
+label4=cy_fare["type"]
+slices4=cy_fare["fare"]
+colors4=["gold","deepskyblue","lightcoral"]
+explode4=(0,0,0.05)
+plt.pie(slices4,explode=explode4,labels=label4,colors=colors4,shadow=True,autopct="%1.1f%%",startangle=140)
 plt.title("Percent of Fares by City Type")
-plt.savefig("fares_by_city.png")
+plt.savefig("fares2_by_city.png")
 plt.show()
 ```
 
@@ -917,35 +366,77 @@ plt.show()
 
 
 ```python
-# This section compares the % of drivers by city type
+#This section looks at drivers by city type :
 ```
 
 
 ```python
-p_drivers=city[["type","driver_count"]]
-dbct=p_drivers.groupby(["type"])
+drivers_by_city_type=mctrdf3[["type","driver_count"]]
+```
+
+
+```python
+dbct=drivers_by_city_type.groupby(["type"])
 c_driver=dbct.sum()
 cy_driver=c_driver.reset_index()
-#cy_driver.head()
 ```
 
 
 ```python
-label3=cy_driver["type"]
-slices3=cy_driver["driver_count"]
-colors3=["gold","deepskyblue","lightcoral"]
-explode3=(0.0,0,0.05)
-plt.pie(slices3,explode=explode3,labels=label3,colors=colors3,shadow=True,autopct="%1.1f%%",startangle=140)
+label2=cy_driver["type"]
+slices2=cy_driver["driver_count"]
+colors2=["gold","deepskyblue","lightcoral"]
+explode2=(0.0,0,0.05)
+plt.pie(slices2,explode=explode2,labels=label2,colors=colors2,shadow=True,autopct="%1.1f%%",startangle=140)
 plt.title("Percent of Drivers by City Type")
 plt.savefig("drivers_by_city.png")
 plt.show()
 ```
 
 
-![png](output_41_0.png)
+![png](output_42_0.png)
 
 
 
 ```python
-
+# This section compares the % of drivers by city type
 ```
+
+
+```python
+sns.lmplot(x="rides",y="fare",data=r_data,fit_reg=False,size=10,hue="type")
+sns.lmplot(x="rides",y="fare",data=u_data,fit_reg=False,size=10,hue="type")
+sns.lmplot(x="rides",y="fare",data=s_data,fit_reg=False,size=10,hue="type")
+```
+
+
+
+
+    <seaborn.axisgrid.FacetGrid at 0x11dff5cf8>
+
+
+
+
+```python
+plt.show()
+```
+
+
+![png](output_45_0.png)
+
+
+
+![png](output_45_1.png)
+
+
+
+![png](output_45_2.png)
+
+
+
+![png](output_45_3.png)
+
+
+
+![png](output_45_4.png)
+
